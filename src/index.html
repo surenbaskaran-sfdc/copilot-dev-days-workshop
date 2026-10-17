@@ -11,11 +11,14 @@
     <section id="start-screen">
       <h1>Dev Days Quiz</h1>
       <p class="lead">Eleven quick questions about Git, GitHub and Copilot.</p>
+      <p id="best-score-start" class="muted" aria-live="polite"></p>
       <button id="start-btn" class="primary">Start quiz</button>
     </section>
 
     <section id="quiz-screen" hidden>
       <p id="progress" class="muted"></p>
+      <label class="muted" for="quiz-progress">Quiz progress</label>
+      <progress id="quiz-progress" class="quiz-progress" value="0" max="1"></progress>
       <p id="timer" class="timer" role="timer" aria-live="off"></p>
       <h2 id="question-text"></h2>
       <ul id="options"></ul>
@@ -27,6 +30,7 @@
       <h2>Quiz complete</h2>
       <p id="score-text" class="lead"></p>
       <p id="grade-text"></p>
+      <p id="best-score-result" aria-live="polite"></p>
       <button id="restart-btn" class="primary">Play again</button>
     </section>
   </main>

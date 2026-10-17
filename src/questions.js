@@ -36,6 +36,41 @@ const QUESTIONS = [
     ],
     answer: 1,
   },
+  {
+    question: "What does `git status` show?",
+    options: [
+      "Working tree changes",
+      "Remote repository branch names",
+      "Your GitHub login",
+      "Deleted commit history",
+    ],
+    answer: 0,
+  },
+  {
+    question: "Which GitHub feature is used to review code before merging?",
+    options: ["Issue tracker", "Pull request", "Wiki page", "Repository badge"],
+    answer: 1,
+  },
+  {
+    question: "Where do GitHub Actions workflow files live?",
+    options: ["workflows/", ".github/actions/", ".git/workflows/", ".github/workflows/"],
+    answer: 3,
+  },
+  {
+    question: "What event triggers a workflow configured with `on: push`?",
+    options: [
+      "A push to the repository",
+      "A scheduled time",
+      "A manual approval",
+      "Opening an issue",
+    ],
+    answer: 0,
+  },
+  {
+    question: "Which key lists commands or actions within a GitHub Actions job?",
+    options: ["runner", "needs", "steps", "permissions"],
+    answer: 2,
+  },
 ];
 
 // Lets Node.js tests load this file. Browsers ignore this block.

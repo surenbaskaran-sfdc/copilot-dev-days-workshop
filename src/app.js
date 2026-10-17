@@ -1,11 +1,16 @@
 // UI code: connects the quiz logic (quiz.js) to the page (index.html).
 
-const state = { questions: [], current: 0, score: 0 };
+let state = createQuiz([]);
+const QUESTION_TIME_LIMIT = 15;
+let timerInterval = null;
+let remainingSeconds = QUESTION_TIME_LIMIT;
+let questionResolved = false;
 
 const startScreen = document.getElementById("start-screen");
 const quizScreen = document.getElementById("quiz-screen");
 const resultScreen = document.getElementById("result-screen");
 const progressText = document.getElementById("progress");
+const timerText = document.getElementById("timer");
 const questionText = document.getElementById("question-text");
 const optionsList = document.getElementById("options");
 const feedbackText = document.getElementById("feedback");
@@ -20,14 +25,15 @@ function showScreen(screenToShow) {
 }
 
 function startQuiz() {
-  state.questions = shuffle(QUESTIONS);
-  state.current = 0;
-  state.score = 0;
+  stopQuestionTimer();
+  state = createQuiz(QUESTIONS);
   showScreen(quizScreen);
   renderQuestion();
 }
 
 function renderQuestion() {
+  stopQuestionTimer();
+  questionResolved = false;
   const question = state.questions[state.current];
   progressText.textContent = `Question ${state.current + 1} of ${state.questions.length}`;
   questionText.textContent = question.question;
@@ -44,15 +50,60 @@ function renderQuestion() {
     item.appendChild(button);
     optionsList.appendChild(item);
   });
+
+  startQuestionTimer();
+}
+
+function startQuestionTimer() {
+  remainingSeconds = QUESTION_TIME_LIMIT;
+  timerText.textContent = formatTimeLeft(remainingSeconds);
+  timerText.classList.remove("warning");
+
+  timerInterval = setInterval(() => {
+    remainingSeconds--;
+    timerText.textContent = formatTimeLeft(remainingSeconds);
+    timerText.classList.toggle("warning", remainingSeconds <= 5);
+
+    if (remainingSeconds === 0) {
+      handleTimeExpired();
+    }
+  }, 1000);
+}
+
+function stopQuestionTimer() {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function handleTimeExpired() {
+  if (questionResolved) return;
+  questionResolved = true;
+  stopQuestionTimer();
+
+  const question = state.questions[state.current];
+  const buttons = optionsList.querySelectorAll("button");
+  buttons.forEach((button) => (button.disabled = true));
+  buttons[question.answer].classList.add("correct");
+  feedbackText.textContent = "Time's up! The correct answer is highlighted.";
+  nextButton.hidden = false;
+  nextButton.focus();
 }
 
 function selectAnswer(selectedIndex, selectedButton) {
+  if (questionResolved) return;
+  questionResolved = true;
+  stopQuestionTimer();
+
   const question = state.questions[state.current];
   const buttons = optionsList.querySelectorAll("button");
   buttons.forEach((button) => (button.disabled = true));
 
-  if (isCorrect(question, selectedIndex)) {
-    state.score++;
+  const result = answerQuestion(state, selectedIndex);
+  state = result.state;
+
+  if (result.correct) {
     selectedButton.classList.add("correct");
     feedbackText.textContent = "Correct!";
   } else {
@@ -66,8 +117,9 @@ function selectAnswer(selectedIndex, selectedButton) {
 }
 
 function nextQuestion() {
-  state.current++;
-  if (state.current < state.questions.length) {
+  stopQuestionTimer();
+  state = advanceQuestion(state);
+  if (!isQuizFinished(state)) {
     renderQuestion();
   } else {
     showResults();
@@ -75,6 +127,7 @@ function nextQuestion() {
 }
 
 function showResults() {
+  stopQuestionTimer();
   const total = state.questions.length;
   const percentage = calculatePercentage(state.score, total);
   scoreText.textContent = `You scored ${state.score} out of ${total} (${percentage}%)`;

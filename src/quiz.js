@@ -22,6 +22,38 @@ function isCorrect(question, selectedIndex) {
 }
 
 /**
+ * Creates a fresh quiz state with questions in randomized order.
+ */
+function createQuiz(questions) {
+  return { questions: shuffle(questions), current: 0, score: 0 };
+}
+
+/**
+ * Returns the updated score state and whether the selected answer is correct.
+ */
+function answerQuestion(state, selectedIndex) {
+  const correct = isCorrect(state.questions[state.current], selectedIndex);
+  return {
+    state: { ...state, score: state.score + (correct ? 1 : 0) },
+    correct
+  };
+}
+
+/**
+ * Returns a new state advanced to the next question.
+ */
+function advanceQuestion(state) {
+  return { ...state, current: state.current + 1 };
+}
+
+/**
+ * Returns true once the current index reaches the end of the question list.
+ */
+function isQuizFinished(state) {
+  return state.current >= state.questions.length;
+}
+
+/**
  * Converts a score into a whole-number percentage (0-100).
  */
 function calculatePercentage(score, total) {
@@ -30,17 +62,45 @@ function calculatePercentage(score, total) {
 }
 
 /**
+ * Formats the remaining quiz time for display.
+ */
+function formatTimeLeft(seconds) {
+  return `⏱ ${seconds}s`;
+}
+
+/**
  * Turns a percentage into a grade.
  * A = 90% or more, B = 75% or more, C = 50% or more.
  */
 function getGrade(percentage) {
-  if (percentage > 90) return "A";
-  if (percentage > 75) return "B";
-  if (percentage > 50) return "C";
+  if (percentage >= 90) return "A";
+  if (percentage >= 75) return "B";
+  if (percentage >= 50) return "C";
   return "Keep practicing";
+}
+
+/**
+ * Returns encouraging feedback for a grade.
+ */
+function getFeedbackMessage(grade) {
+  if (grade === "A") return "Excellent work!";
+  if (grade === "B") return "Great job!";
+  if (grade === "C") return "Good effort!";
+  return "Keep practicing!";
 }
 
 // Lets Node.js tests load this file. Browsers ignore this block.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { shuffle, isCorrect, calculatePercentage, getGrade };
+  module.exports = {
+    shuffle,
+    isCorrect,
+    createQuiz,
+    answerQuestion,
+    advanceQuestion,
+    isQuizFinished,
+    calculatePercentage,
+    formatTimeLeft,
+    getGrade,
+    getFeedbackMessage
+  };
 }

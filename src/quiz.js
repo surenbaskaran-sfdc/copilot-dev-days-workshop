@@ -89,6 +89,13 @@ function getFeedbackMessage(grade) {
   return "Keep practicing!";
 }
 
+/**
+ * Returns true when the current score beats the previous best score.
+ */
+function isNewBestScore(current, best) {
+  return best === null || current > best;
+}
+
 // Lets Node.js tests load this file. Browsers ignore this block.
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
@@ -101,6 +108,7 @@ if (typeof module !== "undefined" && module.exports) {
     calculatePercentage,
     formatTimeLeft,
     getGrade,
-    getFeedbackMessage
+    getFeedbackMessage,
+    isNewBestScore
   };
 }

@@ -12,7 +12,8 @@ const {
   calculatePercentage,
   formatTimeLeft,
   getGrade,
-  getFeedbackMessage
+  getFeedbackMessage,
+  isNewBestScore
 } = require("../src/quiz.js");
 
 test("isCorrect returns true for the right answer", () => {
@@ -112,4 +113,18 @@ test("getFeedbackMessage returns encouraging feedback for each grade", () => {
   assert.equal(getFeedbackMessage("B"), "Great job!");
   assert.equal(getFeedbackMessage("C"), "Good effort!");
   assert.equal(getFeedbackMessage("Keep practicing"), "Keep practicing!");
+});
+
+test("isNewBestScore treats a missing best score as a new record", () => {
+  assert.equal(isNewBestScore(0, null), true);
+  assert.equal(isNewBestScore(75, null), true);
+});
+
+test("isNewBestScore returns true when the current score is higher", () => {
+  assert.equal(isNewBestScore(81, 80), true);
+});
+
+test("isNewBestScore returns false when the current score ties or trails", () => {
+  assert.equal(isNewBestScore(80, 80), false);
+  assert.equal(isNewBestScore(79, 80), false);
 });
